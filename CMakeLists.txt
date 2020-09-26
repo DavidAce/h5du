@@ -110,14 +110,6 @@ endif()
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
 
 
-#######################################################
-###  Check  #include<optional> or                   ###
-###  or     #include<experimental/optional>         ###
-#######################################################
-include(${PROJECT_SOURCE_DIR}/cmake-modules/CheckCXXOptional.cmake)
-CheckCXXOptional()
-
-
 
 ##################################################
 ###  Add optional RELEASE/DEBUG compile flags  ###
@@ -239,12 +231,12 @@ message("")
 # Uninstall target
 if(NOT TARGET uninstall)
     configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/TBUninstall.cmake.in
-            ${CMAKE_CURRENT_BINARY_DIR}/TBUninstall.cmake
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/h5duUninstall.cmake.in
+            ${CMAKE_CURRENT_BINARY_DIR}/h5duUninstall.cmake
             IMMEDIATE @ONLY)
 
     add_custom_target(uninstall
-            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/TBUninstall.cmake)
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/h5duUninstall.cmake)
 endif()
 
 #############################
