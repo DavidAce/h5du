@@ -22,7 +22,7 @@ option <value>              : Description
 -h                          : Help. Shows this text.
 -A                          : Print Attributes
 -D                          : Print Datasets
--d <max depth>              : Max level of recursion in search (default 1 | inf: -1)
+-d <max depth>              : Max level of recursion in search (default -1 (inf)) (WORK IN PROGRESS)
 -f <filepath>               : Path to file to analyze
 -K sort <size|name>         : Sort results according to key (default size)
 -k <filter key>             : Filter links matching key (default "")
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     std::string searchKey;
     std::string searchRoot = ".";
     int         maxHits    = -1;
-    int         maxDepth   = 1;
+    int         maxDepth   = -1;
     size_t      verbosity  = 2;
     bool        printAttr  = false;
     bool        printDset  = false;
