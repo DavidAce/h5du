@@ -1,0 +1,11 @@
+# Here you can specify desired software packages to be downloaded by conan.
+# To activate reading this file from CMakeLists.txt, enable the setting -DH5DU_DOWNLOAD_METHOD=conan
+
+[requires]
+h5pp/1.8.3@
+
+[generators]
+cmake
+
+[options]
+*:shared=False
