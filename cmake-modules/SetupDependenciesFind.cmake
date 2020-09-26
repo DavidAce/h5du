@@ -15,11 +15,11 @@ if(H5DU_DOWNLOAD_METHOD MATCHES "find")
     if(H5DU_PREFER_CONDA_LIBS)
         list(APPEND CMAKE_PREFIX_PATH
                 $ENV{CONDA_PREFIX}
-                $ENV{HOME}/anaconda3/envs/tb
-                $ENV{HOME}/anaconda/envs/tb
-                $ENV{HOME}/miniconda3/envs/tb
-                $ENV{HOME}/miniconda/envs/tb
-                $ENV{HOME}/.conda/envs/tb
+                $ENV{HOME}/anaconda3/envs/h5du
+                $ENV{HOME}/anaconda/envs/h5du
+                $ENV{HOME}/miniconda3/envs/h5du
+                $ENV{HOME}/miniconda/envs/h5du
+                $ENV{HOME}/.conda/envs/h5du
                 $ENV{HOME}/anaconda3
                 $ENV{HOME}/anaconda
                 $ENV{HOME}/miniconda3

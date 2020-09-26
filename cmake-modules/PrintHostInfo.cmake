@@ -1,6 +1,6 @@
 
 
-if(TB_PRINT_INFO)
+if(H5DU_PRINT_INFO)
 
     # Print host properties
     cmake_host_system_information(RESULT _host_name QUERY HOSTNAME)
@@ -9,7 +9,7 @@ if(TB_PRINT_INFO)
     cmake_host_system_information(RESULT _os_release QUERY OS_RELEASE)
     cmake_host_system_information(RESULT _os_version QUERY OS_VERSION)
     cmake_host_system_information(RESULT _os_platform QUERY OS_PLATFORM)
-    message(STATUS "| TB BUILD INFO:\n"
+    message(STATUS "| H5DU BUILD INFO:\n"
             "-- |----------------\n"
             "-- | ${_host_name}\n"
             "-- | ${_os_name} ${_os_platform} ${_os_release}\n"

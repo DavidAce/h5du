@@ -7,19 +7,19 @@ message(STATUS "CXX compiler ${CMAKE_CXX_COMPILER}")
 ### Set  the same microarchitecture for c++ and OpenBLAS ###
 ############################################################
 
-if(NOT TB_MICROARCH)
-    set(TB_MICROARCH "native")
+if(NOT H5DU_MICROARCH)
+    set(H5DU_MICROARCH "native")
 endif()
-if(TB_MICROARCH)
-    if (${TB_MICROARCH} STREQUAL "zen")
-        string(TOUPPER ${TB_MICROARCH} OPENBLAS_MARCH)
+if(H5DU_MICROARCH)
+    if (${H5DU_MICROARCH} STREQUAL "zen")
+        string(TOUPPER ${H5DU_MICROARCH} OPENBLAS_MARCH)
         set(CXX_MARCH znver1)
-    elseif (${TB_MICROARCH} STREQUAL "native")
+    elseif (${H5DU_MICROARCH} STREQUAL "native")
         set(OPENBLAS_MARCH HASWELL)
         set(CXX_MARCH native)
     else()
-        string(TOUPPER ${TB_MICROARCH} OPENBLAS_MARCH)
-        string(TOLOWER ${TB_MICROARCH} CXX_MARCH)
+        string(TOUPPER ${H5DU_MICROARCH} OPENBLAS_MARCH)
+        string(TOLOWER ${H5DU_MICROARCH} CXX_MARCH)
     endif()
 endif()
 
@@ -71,7 +71,7 @@ endif()
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
 # when building, don't use the install RPATH already (but later on when installing)
-# Note: Since TB++ is often run from the build folder we want to keep the build-folder RPATH in the executable.
+# Note: Since h5du is often run from the build folder we want to keep the build-folder RPATH in the executable.
 #       Therefore itt makes sense to keep this setting "FALSE" here but "TRUE" for dependencies that are
 #       installed with in "fetch" mode with externalproject_add
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)

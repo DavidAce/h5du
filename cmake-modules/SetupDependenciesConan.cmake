@@ -21,7 +21,7 @@ if(H5DU_DOWNLOAD_METHOD MATCHES "conan")
                 conan
                 HINTS ${CONAN_PREFIX} $ENV{CONAN_PREFIX} ${CONDA_PREFIX} $ENV{CONDA_PREFIX}
                 PATHS $ENV{HOME}/anaconda3  $ENV{HOME}/miniconda3 $ENV{HOME}/anaconda $ENV{HOME}/miniconda $ENV{HOME}/.conda
-                PATH_SUFFIXES bin envs/tb/bin  envs/dmrg/bin
+                PATH_SUFFIXES bin envs/h5du/bin  envs/dmrg/bin
         )
         if(NOT CONAN_COMMAND)
             message(FATAL_ERROR "Could not find conan program executable")

@@ -57,8 +57,8 @@ include(cmake-modules/gitversion.cmake)
 include(GNUInstallDirs)
 string(TOLOWER ${CMAKE_BUILD_TYPE} cmake_build_type)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    message(STATUS "Setting default install prefix -- CMAKE_INSTALL_PREFIX --> ${CMAKE_BINARY_DIR}/tb-deps-install")
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/tb-deps-install" CACHE PATH "..." FORCE)
+    message(STATUS "Setting default install prefix -- CMAKE_INSTALL_PREFIX --> ${CMAKE_BINARY_DIR}/h5du-deps-install")
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/h5du-deps-install" CACHE PATH "..." FORCE)
 endif()
 
 
