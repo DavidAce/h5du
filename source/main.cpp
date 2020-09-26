@@ -39,6 +39,9 @@ Example 1 - Print the size of all groups recursively in descending order of size
 Example 2 - Print the size of all groups and datasets recursively in ascending order of name:
     ./h5du -f myfile.h5 -D -K name
 
+Example 3 - Print the size of all groups starting from group "grpA/grpB":
+    ./h5du -f myfile.h5 -l grpA/grpB
+
 )";
 }
 
