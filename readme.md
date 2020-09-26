@@ -1,6 +1,6 @@
 # h5du
 
-```bash
+```
 ==========  h5du  ============
 HDF5 Disk Usage Analyzer
 
@@ -34,6 +34,7 @@ Example 3 - Print the size of all groups starting from group "grpA/grpB":
 
 
 ## Example output
+
 ```
 > ./h5du -f ../example.h5 -l xDMRG
 
