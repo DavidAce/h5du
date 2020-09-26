@@ -5,9 +5,7 @@
 #include <meta/attrmeta.h>
 #include <meta/dsetmeta.h>
 #include <meta/groupmeta.h>
-#include <tools/class_tic_toc.h>
 #include <tools/log.h>
-#include <tools/prof.h>
 #include <tools/tree.h>
 void print_usage() {
     std::cout <<
@@ -75,7 +73,8 @@ int main(int argc, char *argv[]) {
             case 'f': filepath = optarg; continue;
             case 'K': {
                 if(std::string_view(optarg).find("size") != std::string::npos) key = SortKey::SIZE;
-                else if(std::string_view(optarg).find("name") != std::string::npos) key = SortKey::NAME;
+                else if(std::string_view(optarg).find("name") != std::string::npos)
+                    key = SortKey::NAME;
                 continue;
             }
             case 'k': searchKey = optarg; continue;
@@ -83,12 +82,14 @@ int main(int argc, char *argv[]) {
             case 'n': maxHits = std::stoi(optarg, nullptr, 10); continue;
             case 'O': {
                 if(std::string_view(optarg).find("asc") != std::string::npos) order = SortOrder::ASCENDING;
-                else if(std::string_view(optarg).find("desc") != std::string::npos) order = SortOrder::DESCENDING;
+                else if(std::string_view(optarg).find("desc") != std::string::npos)
+                    order = SortOrder::DESCENDING;
                 continue;
             }
             case 'T': {
                 if(std::string_view(optarg).find("dset") != std::string::npos) type = SortType::DSET;
-                else if(std::string_view(optarg).find("attr") != std::string::npos) type = SortType::ATTR;
+                else if(std::string_view(optarg).find("attr") != std::string::npos)
+                    type = SortType::ATTR;
                 continue;
             }
             case 'v': verbosity = std::strtoul(optarg, nullptr, 10); continue;
@@ -114,7 +115,8 @@ int main(int argc, char *argv[]) {
     for(auto &group : file.findGroups(searchKey, searchRoot, maxHits, maxDepth)) {
         // For each group we scan it's dataset, attribute and group content
         if(group == ".") group = searchRoot;
-        else group = h5pp::format("{}/{}",searchRoot,group);
+        else
+            group = h5pp::format("{}/{}", searchRoot, group);
         auto                     groupFound = file.findGroups(searchKey, group, maxHits, 0);
         auto                     dsetsFound = file.findDatasets(searchKey, group, maxHits, 0);
         std::vector<std::string> attrsFound;
@@ -134,20 +136,22 @@ int main(int argc, char *argv[]) {
             for(auto &attr : file.getAttributeNames(dset.path)) { dset.attrMetas.emplace_back(file.getAttributeInfo(h5pp::format("{}", dset.path), attr)); }
         }
     }
-    if(groupTree.empty()) throw std::runtime_error(h5pp::format("Nothing found in file [{}] starting from root [{}] matching key [{}]",file.getFilePath(),searchRoot,searchKey));
+    if(groupTree.empty())
+        throw std::runtime_error(
+            h5pp::format("Nothing found in file [{}] starting from root [{}] matching key [{}]", file.getFilePath(), searchRoot, searchKey));
     tools::tree::collectBytes(groupTree, searchRoot);
-    for(auto &group : groupTree) group.second.sort(key,order,type);
-    auto groupTreeSorted = tools::tree::sort(groupTree,key,order,type);
+    for(auto &group : groupTree) group.second.sort(key, order, type);
+    auto groupTreeSorted = tools::tree::sort(groupTree, key, order, type);
 
     h5pp::print("{:<12}{:64}{:>16}{:>16}{:>16}{:>16}{:>16}{:>16}\n", "Type", "Path", "Dataset size", "Storage size", "Ratio", "Attribute size", "Storage size",
                 "Ratio");
     for(auto &[group, groupMeta] : groupTreeSorted) {
         h5pp::print("{:<12}{:<64}{:>16}{:>16}{:>16.2f}{:>16}{:>16}{:>16.2f}\n", "Group", groupMeta.path, groupMeta.dsetByte, groupMeta.dsetStrg,
                     groupMeta.dsetRatio, groupMeta.attrByte, groupMeta.attrStrg, groupMeta.attrRatio);
-        if(printDset){
+        if(printDset) {
             for(auto &dset : groupMeta.dsetMetas) {
-                h5pp::print("{:<12}{:<64}{:>16}{:>16}{:>16.2f}{:>16}{:>16}{:>16.2f}\n", "Dataset", h5pp::format("  {}", dset.name), dset.dsetByte, dset.dsetStrg,
-                            dset.dsetRatio, dset.attrByte, dset.attrStrg, dset.attrRatio);
+                h5pp::print("{:<12}{:<64}{:>16}{:>16}{:>16.2f}{:>16}{:>16}{:>16.2f}\n", "Dataset", h5pp::format("  {}", dset.name), dset.dsetByte,
+                            dset.dsetStrg, dset.dsetRatio, dset.attrByte, dset.attrStrg, dset.attrRatio);
                 if(not printAttr) continue;
                 for(auto &attr : dset.attrMetas) {
                     h5pp::print("{:<12}{:<64}{:>16}{:>16}{:>16}{:>16}{:>16}{:>16.2f}\n", "Attribute", h5pp::format("   {}", attr.name), " ", " ", " ",
@@ -155,7 +159,7 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-        if(printAttr){
+        if(printAttr) {
             for(auto &attr : groupMeta.attrMetas) {
                 h5pp::print("{:<12}{:<64}{:>16}{:>16}{:>16}{:>16}{:>16}{:>16.2f}\n", "Attribute", h5pp::format("   {}", attr.name), " ", " ", " ",
                             attr.attrByte, attr.attrStrg, attr.ratio);

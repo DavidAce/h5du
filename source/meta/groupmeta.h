@@ -1,5 +1,6 @@
 #pragma once
 #include "dsetmeta.h"
+#include "attrmeta.h"
 #include "enums.h"
 #include <h5pp/h5pp.h>
 #include <string>
