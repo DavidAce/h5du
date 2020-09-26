@@ -122,12 +122,12 @@ build_type_lower=$(echo $build_type | tr '[:upper:]' '[:lower:]')
 for lib in "${clear_libs[@]}"; do
     if [[ "$lib" == "all" ]]; then
         echo "Clearing all installed libraries"
-        rm -r ./build/$build_type/tb-deps-build/*
-        rm -r ./build/$build_type/tb-deps-install/*
+        rm -r ./build/$build_type/h5du-deps-build/*
+        rm -r ./build/$build_type/h5du-deps-install/*
     else
         echo "Clearing library: $lib"
-        rm -r ./build/$build_type/tb-deps-build/$lib
-        rm -r ./build/$build_type/tb-deps-install/$lib
+        rm -r ./build/$build_type/h5du-deps-build/$lib
+        rm -r ./build/$build_type/h5du-deps-install/$lib
     fi
 done
 
@@ -223,15 +223,6 @@ elif [[ "$compiler" =~ Clang|clang|cl ]] ; then
     echo "Exporting compiler flags for Clang"
     export CC=clang
     export CXX=clang++
-elif [[ "$compiler" =~ Tau|tau ]] ; then
-    echo "Exporting compiler flags for Tau"
-    echo "Enabling shared linking for Tau"
-    echo "Hint: If this doesnt work, try compiling normally with the plain compiler once first"
-    enable_shared="ON"
-    export PATH=/home/david/GitProjects/TB++/.tau/bin/ThinkStation/:$PATH
-    export CC=tau_gcc
-    export CXX=tau_g++
-    export FC=tau_gfortran
 fi
 
 
@@ -258,13 +249,13 @@ cat << EOF >&2
     cmake -DCMAKE_BUILD_TYPE=$build_type
           -DBUILD_SHARED_LIBS=$enable_shared
           -DCMAKE_VERBOSE_MAKEFILE=$verbose
-          -DTB_PRINT_INFO=$verbose
-          -DTB_DOWNLOAD_METHOD=$download_method
-          -DTB_PREFER_CONDA_LIBS:BOOL=$prefer_conda
-          -DTB_MICROARCH=$march
-          -DTB_ENABLE_TESTS:BOOL=$enable_tests
-          -DTB_ENABLE_LTO=$enable_lto
-          -DTB_ENABLE_ASAN=$enable_asan
+          -DH5DU_PRINT_INFO=$verbose
+          -DH5DU_DOWNLOAD_METHOD=$download_method
+          -DH5DU_PREFER_CONDA_LIBS:BOOL=$prefer_conda
+          -DH5DU_MICROARCH=$march
+          -DH5DU_ENABLE_TESTS:BOOL=$enable_tests
+          -DH5DU_ENABLE_LTO=$enable_lto
+          -DH5DU_ENABLE_ASAN=$enable_asan
           $extra_flags
            -G $generator
            ../../
@@ -277,14 +268,14 @@ if [ -z "$dry_run" ] ;then
     cmake -DCMAKE_BUILD_TYPE=$build_type \
           -DBUILD_SHARED_LIBS=$enable_shared \
           -DCMAKE_VERBOSE_MAKEFILE=$verbose \
-          -DTB_PRINT_INFO=$verbose \
-          -DTB_PRINT_CHECKS=$verbose \
-          -DTB_DOWNLOAD_METHOD=$download_method \
-          -DTB_PREFER_CONDA_LIBS:BOOL=$prefer_conda \
-          -DTB_MICROARCH=$march \
-          -DTB_ENABLE_TESTS:BOOL=$enable_tests \
-          -DTB_ENABLE_LTO=$enable_lto \
-          -DTB_ENABLE_ASAN=$enable_asan \
+          -DH5DU_PRINT_INFO=$verbose \
+          -DH5DU_PRINT_CHECKS=$verbose \
+          -DH5DU_DOWNLOAD_METHOD=$download_method \
+          -DH5DU_PREFER_CONDA_LIBS:BOOL=$prefer_conda \
+          -DH5DU_MICROARCH=$march \
+          -DH5DU_ENABLE_TESTS:BOOL=$enable_tests \
+          -DH5DU_ENABLE_LTO=$enable_lto \
+          -DH5DU_ENABLE_ASAN=$enable_asan \
           $extra_flags \
            -G "$generator" \
            ../../

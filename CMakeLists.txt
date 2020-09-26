@@ -14,7 +14,7 @@ option(H5DU_ENABLE_LTO               "Enable link time optimization"            
 option(H5DU_ENABLE_TESTS             "Enable unit testing with ctest"                               OFF)
 option(H5DU_BUILD_EXAMPLES           "Build examples"                                               OFF)
 option(H5DU_PRINT_INFO               "Print information during cmake configure"                     OFF)
-option(H5DU_DEPS_IN_SUBDIR           "Install dependencies into CMAKE_INSTALL_PREFIX/<libname>"     ON)
+option(H5DU_DEPS_IN_SUBDIR           "Install dependencies into CMAKE_INSTALL_PREFIX/<libname>"     OFF)
 option(H5DU_ENABLE_ASAN              "Enable runtime address sanitizer -fsanitize=address"          OFF)
 
 
