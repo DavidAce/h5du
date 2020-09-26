@@ -10,7 +10,7 @@ Usage            : $PROGNAME [-option | --option ] <=argument>
 -b | --build-type [=arg]        : Build type: [ Release | RelWithDebInfo | Debug | Profile ]  (default = Release)
 -c | --clear-cmake              : Clear CMake files before build (delete ./build)
 -d | --dry-run                  : Dry run
-   | --download-method          : Download method for dependencies [ find | fetch | find-or-fetch | conan ] (default = find)
+   | --download-method          : Download method for dependencies [ find | fetch | find-or-fetch | conan ] (default = fetch)
 -f | --extra-flags [=arg]       : Extra CMake flags (defailt = none)
 -g | --compiler [=arg]          : Compiler        | GNU | Clang | Tau (default = "")
 -G | --generator [=arg]         : CMake generator  | many options... | (default = "CodeBlocks - Unix Makefiles")
@@ -67,7 +67,7 @@ build_type="Release"
 target="all"
 march="haswell"
 enable_shared="OFF"
-download_method="find"
+download_method="fetch"
 enable_tests="OFF"
 enable_lto="OFF"
 enable_asan="OFF"
