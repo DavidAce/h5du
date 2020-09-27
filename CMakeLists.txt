@@ -82,9 +82,7 @@ include(cmake-modules/CompilerFlags.cmake)
 add_executable(${PROJECT_NAME}
         source/main.cpp
         source/tools/tree.cpp
-        source/tools/prof.cpp
         source/tools/log.cpp
-        source/tools/class_tic_toc.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE source)
 add_library(project-settings INTERFACE)
