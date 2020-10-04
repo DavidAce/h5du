@@ -96,9 +96,9 @@ Group     xDMRG/state_0/finished/mps                                    7.59 MiB
 Group     xDMRG/state_0/checkpoint/iter_last/mps                        7.65 MiB        3.84 MiB    1.99        1.15 KiB
 Group     xDMRG/state_0/projection                                     61.20 KiB       80.48 KiB    0.76        2.23 KiB
 Group     xDMRG/state_0/tables                                         19.14 KiB       63.52 KiB    0.30        1.67 KiB
-Group     xDMRG/state_0/projection/mps                                 47.34 KiB       13.85 KiB    3.42       536.00  B```
-
+Group     xDMRG/state_0/projection/mps                                 47.34 KiB       13.85 KiB    3.42       536.00  B
 ```
+
 ### Example 3
 ```
 > ./h5du -f ../example.h5 -D -K name -O asc
