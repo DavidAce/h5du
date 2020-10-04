@@ -8,8 +8,8 @@ namespace tools {
         if(on) {
             if(base != 1000 and base != 1024) throw std::runtime_error("Base must be either 1000 or 1024");
             constexpr uint64_t                             orders        = 6;
-            constexpr std::array<std::string_view, orders> suffixes_1024 = {" B", "KiB", "MiB", "GiB", "TiB", "PiB"};
-            constexpr std::array<std::string_view, orders> suffixes_1000 = {" B", "kB", "MB", "GB", "TB", "PB"};
+            constexpr std::array<std::string_view, orders> suffixes_1024 = {"B  ", "KiB", "MiB", "GiB", "TiB", "PiB"};
+            constexpr std::array<std::string_view, orders> suffixes_1000 = {"B ", "kB", "MB", "GB", "TB", "PB"};
             auto                                           dblBase       = static_cast<double>(base);
             auto                                           dblByte       = static_cast<double>(bytes);
 
