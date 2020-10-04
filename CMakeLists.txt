@@ -83,6 +83,7 @@ add_executable(${PROJECT_NAME}
         source/main.cpp
         source/tools/tree.cpp
         source/tools/log.cpp
+        source/tools/human.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE source)
 add_library(project-settings INTERFACE)

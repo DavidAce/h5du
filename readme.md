@@ -6,18 +6,21 @@ HDF5 Disk Usage Analyzer
 
 Usage                                : ./h5du [-option <value>].
 ----------------------------------------------------------------------------------------------------
-option  <value>           default    : Description
+option  <value>            default   : Description
 ----------------------------------------------------------------------------------------------------
 -h                                   : Help. Shows this text.
 -A                                   : Print Attributes
+-B      <1000|1024>        1024      : Base for converting bytes to human-readable units (kB/KiB)
 -D                                   : Print Datasets
--d      <depth filter>    -1 (inf)   : Print objects in groups up to this depth
+-d      <depth filter>     -1 (inf)  : Print objects in groups up to this depth
 -f      <filepath>                   : Path to file to analyze
+-H                                   : Print human-readable units (kB/KiB, MB/MiB...)
 -K      <size|name>        size      : Sort results according to key "size" or "name"
 -k      <filter key>                 : Filter links matching key
 -g      <group root>       .         : Start analysis from group
 -n      <num hits>         -1 (inf)  : Max number of search hits
 -O      <desc|asc>         desc      : Sort results in ascending/descending order
+-p      <num decimals>     2         : Number of decimals used when printing human-readable units
 -T      <dset|attr>        dset      : Sort results according to dataset or attribute
 -v      <level>            2         : Enables verbose logging at level 0 (max) to 5 (min)
 -V      <level>            2         : As "-v" but for the underlying h5pp library (very verbose)
@@ -26,8 +29,8 @@ option  <value>           default    : Description
 Example 1 - Print the size of all groups recursively in descending order of size:
      ./h5du -f example.h5
 
-Example 2 - Print the size of all groups starting from group "grpA/grpB":
-    ./h5du -f example.h5 -g grpA/grpB
+Example 2 - Print the size of all groups starting from group "grpA/grpB" in human-readable units:
+    ./h5du -f example.h5 -g grpA/grpB -H
 
 Example 3 - Print the size of all groups and datasets recursively in ascending order of name:
     ./h5du -f example.h5 -D -K name -O asc
@@ -83,22 +86,20 @@ Group     git                                                                 25
 
 ### Example 2
 ```
-> ./h5du -f ../example.h5 -g xDMRG/state_0
+> ./h5du -f ../example.h5 -g xDMRG/state_0 -H
 Type      Path                                                      Dataset size    Storage size   Ratio  Attribute size
-Group     xDMRG/state_0                                                 16104024         8344188    1.93            9840
-Group     xDMRG/state_0/finished                                         7970072         4099817    1.94            2922
-Group     xDMRG/state_0/checkpoint                                       8051688         4096915    1.97            2922
-Group     xDMRG/state_0/checkpoint/iter_last                             8051688         4096915    1.97            2922
-Group     xDMRG/state_0/finished/mps                                     7964352         4031629    1.98            1176
-Group     xDMRG/state_0/checkpoint/iter_last/mps                         8027120         4028711    1.99            1176
-Group     xDMRG/state_0/projection                                         62664           82408    0.76            2282
-Group     xDMRG/state_0/tables                                             19600           65048    0.30            1714
-Group     xDMRG/state_0/projection/mps                                     48480           14187    3.42             536
+Group     xDMRG/state_0                                                15.36 MiB        7.96 MiB    1.93        9.61 KiB
+Group     xDMRG/state_0/finished                                        7.60 MiB        3.91 MiB    1.94        2.85 KiB
+Group     xDMRG/state_0/checkpoint                                      7.68 MiB        3.91 MiB    1.97        2.85 KiB
+Group     xDMRG/state_0/checkpoint/iter_last                            7.68 MiB        3.91 MiB    1.97        2.85 KiB
+Group     xDMRG/state_0/finished/mps                                    7.59 MiB        3.84 MiB    1.98        1.15 KiB
+Group     xDMRG/state_0/checkpoint/iter_last/mps                        7.65 MiB        3.84 MiB    1.99        1.15 KiB
+Group     xDMRG/state_0/projection                                     61.20 KiB       80.48 KiB    0.76        2.23 KiB
+Group     xDMRG/state_0/tables                                         19.14 KiB       63.52 KiB    0.30        1.67 KiB
+Group     xDMRG/state_0/projection/mps                                 47.34 KiB       13.85 KiB    3.42       536.00  B```
+
 ```
-
-
 ### Example 3
-
 ```
 > ./h5du -f ../example.h5 -D -K name -O asc
 Type      Path                                                      Dataset size    Storage size   Ratio  Attribute size
