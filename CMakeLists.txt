@@ -5,8 +5,8 @@ project(h5du
         HOMEPAGE_URL "")
 
 
-# Make sure we use DMRG's own find modules
-list(INSERT CMAKE_MODULE_PATH 0  ${PROJECT_SOURCE_DIR}/cmake-modules)
+# Make sure we bundled find modules
+list(INSERT CMAKE_MODULE_PATH 0  ${PROJECT_SOURCE_DIR}/cmake)
 
 # Set options this build
 option(H5DU_PREFER_CONDA_LIBS        "Prefer libraries installed through anaconda"                  OFF)
@@ -19,14 +19,17 @@ option(H5DU_ENABLE_ASAN              "Enable runtime address sanitizer -fsanitiz
 
 
 # Make an "enum" for valid download methods
-set(H5DU_DOWNLOAD_METHODS_VALID find fetch find-or-fetch conan)
-set(H5DU_DOWNLOAD_METHOD find CACHE STRING "Download method for external dependencies")
-set_property(CACHE H5DU_DOWNLOAD_METHOD PROPERTY STRINGS ${H5DU_DOWNLOAD_METHODS_VALID})
-if (NOT H5DU_DOWNLOAD_METHOD IN_LIST H5DU_DOWNLOAD_METHODS_VALID)
-    message(FATAL_ERROR "H5DU_DOWNLOAD_METHOD must be one of ${H5DU_DOWNLOAD_METHODS_VALID}")
+set(H5DU_PACKAGE_MANAGERS_VALID find cmake conan)
+set(H5DU_PACKAGE_MANAGER find CACHE STRING "Download method for external dependencies")
+set_property(CACHE H5DU_PACKAGE_MANAGER PROPERTY STRINGS ${H5DU_PACKAGE_MANAGERS_VALID})
+if (NOT H5DU_PACKAGE_MANAGER IN_LIST H5DU_PACKAGE_MANAGERS_VALID)
+    message(FATAL_ERROR "H5DU_PACKAGE_MANAGER must be one of ${H5DU_PACKAGE_MANAGERS_VALID}")
 endif ()
 
 
+# Setup paths that find_package should search and
+# let cmake find our Find<package>.cmake modules
+include(cmake/SetupPaths.cmake)
 
 
 # Set default policies if CMake is new enough
@@ -48,31 +51,19 @@ endif()
 ### Include it using #include <gitversion.h>                 ###
 ### Gives a namespace GIT:: with several git version numbers.###
 ################################################################
-include(cmake-modules/gitversion.cmake)
-
-
-##################################################################
-### Setup dependency paths                                     ###
-##################################################################
-include(GNUInstallDirs)
-string(TOLOWER ${CMAKE_BUILD_TYPE} cmake_build_type)
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    message(STATUS "Setting default install prefix -- CMAKE_INSTALL_PREFIX --> ${CMAKE_BINARY_DIR}/h5du-deps-install")
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/h5du-deps-install" CACHE PATH "..." FORCE)
-endif()
-
+include(cmake/gitversion.cmake)
 
 
 ############################################################
 ### Print extra info during CMake configure              ###
 ############################################################
-include(cmake-modules/PrintHostInfo.cmake)
-include(cmake-modules/PrintOptionInfo.cmake)
+include(cmake/PrintHostInfo.cmake)
+include(cmake/PrintOptionInfo.cmake)
 
 ###########################################
 ###  Apply RELEASE/DEBUG compile flags  ###
 ###########################################
-include(cmake-modules/CompilerFlags.cmake)
+include(cmake/CompilerFlags.cmake)
 
 
 
@@ -87,19 +78,6 @@ add_executable(${PROJECT_NAME}
 )
 target_include_directories(${PROJECT_NAME} PRIVATE source)
 add_library(project-settings INTERFACE)
-##################################################################
-###  Force cmake to find .a library suffixes on static builds  ###
-##################################################################
-if(BUILD_SHARED_LIBS)
-    set(LINK_TYPE SHARED)
-else()
-    set(LINK_TYPE STATIC)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX} )
-#    target_link_libraries  (project-settings INTERFACE -static)   ### Static linkage
-endif()
-
-
-
 
 ##############################
 ###  Enable c++17 support  ###
@@ -170,13 +148,12 @@ if(H5DU_PREFER_CONDA_LIBS)
 endif()
 
 
-
 ###########################################
 ### Fetch or find all the dependencies  ###
 ###########################################
-include(cmake-modules/SetupDependenciesFind.cmake)
-include(cmake-modules/SetupDependenciesFetch.cmake)
-include(cmake-modules/SetupDependenciesConan.cmake)
+include(cmake/SetupDependencies.cmake)
+
+
 
 ##################################################################
 ### Link all the things!                                       ###
@@ -201,11 +178,11 @@ endif()
 
 # Print summary of CMake configuration
 if (H5DU_PRINT_INFO)
-    include(cmake-modules/PrintTargetInfo.cmake)
-    include(cmake-modules/getExpandedTarget.cmake)
+    include(cmake/PrintTargetInfo.cmake)
+    include(cmake/getExpandedTarget.cmake)
     expand_target_all_targets(project-settings H5DU_TARGETS_EXPANDED)
-    message(STATUS "| TB TARGET SUMMARY")
-    message(STATUS "|--------------------")
+    message(DEBUG "| TB TARGET SUMMARY")
+    message(DEBUG "|--------------------")
     print_compiler_info("| ")
     foreach(tgt ${H5DU_TARGETS_EXPANDED})
         print_target_info(${tgt} "| ")
@@ -230,7 +207,7 @@ message("")
 # Uninstall target
 if(NOT TARGET uninstall)
     configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/h5duUninstall.cmake.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/h5duUninstall.cmake.in
             ${CMAKE_CURRENT_BINARY_DIR}/h5duUninstall.cmake
             IMMEDIATE @ONLY)
 

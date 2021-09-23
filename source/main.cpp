@@ -31,7 +31,7 @@ option  <value>            default   : Description
 -n      <num hits>         -1 (inf)  : Max number of search hits
 -O      <desc|asc>         desc      : Sort results in ascending/descending order
 -p      <num decimals>     2         : Number of decimals used when printing human-readable units
--T      <dset|attr>        dset      : Sort results according to dataset or attribute
+-T      <dset|attr|link>   dset      : Sort results according to dataset or attribute
 -v      <level>            2         : Enables verbose logging at level 0 (max) to 5 (min)
 -V      <level>            2         : As "-v" but for the underlying h5pp library (very verbose)
 ----------------------------------------------------------------------------------------------------
@@ -111,6 +111,8 @@ int main(int argc, char *argv[]) {
                 if(std::string_view(optarg).find("dset") != std::string::npos) type = SortType::DSET;
                 else if(std::string_view(optarg).find("attr") != std::string::npos)
                     type = SortType::ATTR;
+                else if(std::string_view(optarg).find("link") != std::string::npos)
+                    type = SortType::LINK;
                 continue;
             }
             case 'v':
@@ -133,7 +135,7 @@ int main(int argc, char *argv[]) {
     // Sanitize inputs
     if(filepath.empty()) {
         print_usage();
-        throw std::runtime_error(h5pp::format("Invalid path to file: {}\n\tSet argument -f <valid filepath>.", filepath));
+        throw std::runtime_error(fmt::format(FMT_COMPILE("Invalid path to file: {}\n\tSet argument -f <valid filepath>."), filepath));
     }
     // Fix for users sometimes starting paths with "./", just remove it
     removeSubstring(groupRoot, "./");
@@ -145,7 +147,7 @@ int main(int argc, char *argv[]) {
     for(auto &group : file.findGroups(filterKey, groupRoot, filterHits, -1)) {
         if(group == ".") group = groupRoot;
         else if(groupRoot != ".")
-            group = h5pp::format("{}/{}", groupRoot, group);
+            group = fmt::format(FMT_COMPILE("{}/{}"), groupRoot, group);
         if(groupTree.find(group) == groupTree.end()) groupTree[group] = GroupMeta(group);
         auto &groupMeta = groupTree[group];
 
@@ -154,27 +156,33 @@ int main(int argc, char *argv[]) {
 
         // Add datasets inside this group
         for(auto &dset : file.findDatasets(filterKey, group, filterHits, 0))
-            groupMeta.dsetMetas.emplace_back(file.getDatasetInfo(h5pp::format("{}/{}", group, dset)));
+            groupMeta.dsetMetas.emplace_back(file.getDatasetInfo(fmt::format(FMT_COMPILE("{}/{}"), group, dset)));
         // Add attributes attached to this group
         std::vector<std::string> attrsFound;
         if(group.find('/') != std::string::npos) attrsFound = file.getAttributeNames(group);
         for(auto &attr : attrsFound) groupMeta.attrMetas.emplace_back(file.getAttributeInfo(group, attr));
-        // To each dataset, add the attributes attached to that dataset
-        for(auto &dset : groupMeta.dsetMetas)
+        // Add link header of this group
+        groupMeta.linkMetas.emplace_back(file.getLinkInfo(group));
+
+        // To each dataset, add the attributes and header attached to that dataset
+        for(auto &dset : groupMeta.dsetMetas){
             for(auto &attr : file.getAttributeNames(dset.path)) dset.attrMetas.emplace_back(file.getAttributeInfo(dset.path, attr));
+            dset.linkMetas.emplace_back(file.getLinkInfo(dset.path));
+        }
+
 
         // Add subgroups to this group.
         for(auto &subg : file.findGroups(filterKey, group, -1, 0)) {
             if(group == ".") groupMeta.subGroups.emplace_back(subg);
             else
-                groupMeta.subGroups.emplace_back(h5pp::format("{}/{}", groupMeta.path, subg));
+                groupMeta.subGroups.emplace_back(fmt::format(FMT_COMPILE("{}/{}"), groupMeta.path, subg));
         }
     }
 
     // Throw error if nothing found
     if(groupTree.empty())
         throw std::runtime_error(
-            h5pp::format("Nothing found in file [{}] starting from root [{}] matching key [{}]", file.getFilePath(), groupRoot, filterKey));
+            fmt::format(FMT_COMPILE("Nothing found in file [{}] starting from root [{}] matching key [{}]"), file.getFilePath(), groupRoot, filterKey));
 
     // Count up the bytes in the tree that was found
     tools::tree::collectBytes(groupTree, groupRoot);
@@ -185,33 +193,38 @@ int main(int argc, char *argv[]) {
     for(auto &group : groupTree) group.second.sort(key, order, type);
     auto groupTreeSorted = tools::tree::sort(groupTree, key, order, type);
 
+    // Find the longest path in the tree to set the width of the "Path" column
+    size_t maxPathSize = tools::tree::getMaxPathSize(groupTreeSorted, filterDepth, printDset, printAttr);
+
     // Print report
-    h5pp::print("{:<10}{:54}{:>16}{:>16}{:>8}{:>16}\n", "Type", "Path", "Dataset size", "Storage size", "Ratio", "Attribute size");
-    for(auto &[group, groupMeta] : groupTreeSorted) {
+    fmt::print(FMT_COMPILE("{1:<10}{2:<{0}}{3:>16}{4:>16}{5:>8}{6:>16}{7:>16}\n"), maxPathSize, "Type", "Path", "Dataset size", "Storage size", "Ratio", "Attribute size", "Header Size");
+    for(const auto &[group, groupMeta] : groupTreeSorted) {
         // Do not print if user wants to filter off groups deeper than filterDepth
         if(filterDepth >= 0 and groupMeta.depth > filterDepth) continue;
 
         // Print the current group
-        h5pp::print("{:<10}{:<54}{:>16}{:>16}{:>8.2f}{:>16}\n", "Group", groupMeta.path, tools::fmtBytes(humanRead, groupMeta.dsetByte, base, decimals),
-                    tools::fmtBytes(humanRead,groupMeta.dsetStrg, base, decimals), groupMeta.dsetRatio, tools::fmtBytes(humanRead, groupMeta.attrByte, base, decimals));
+        fmt::print(FMT_COMPILE("{1:<10}{2:<{0}}{3:>16}{4:>16}{5:>8.2f}{6:>16}{7:>16}\n"), maxPathSize, "Group", groupMeta.path, tools::fmtBytes(humanRead, groupMeta.dsetByte, base, decimals),
+                    tools::fmtBytes(humanRead, groupMeta.dsetStrg, base, decimals), groupMeta.dsetRatio,
+                    tools::fmtBytes(humanRead, groupMeta.attrByte, base, decimals), tools::fmtBytes(humanRead, groupMeta.linkByte, base, decimals));
         if(printDset) {
             // Print datasets
-            for(auto &dset : groupMeta.dsetMetas) {
-                h5pp::print("{:<10}{:<54}{:>16}{:>16}{:>8.2f}{:>16}\n", "Dataset", h5pp::format("{:^{}}{}", " ", 4, dset.name),
-                            tools::fmtBytes(humanRead, dset.dsetByte, base, decimals), tools::fmtBytes(humanRead,dset.dsetStrg, base, decimals), dset.dsetRatio,
-                            tools::fmtBytes(humanRead, dset.attrByte, base, decimals));
+            for(const auto &dset : groupMeta.dsetMetas) {
+                fmt::print(FMT_COMPILE("{1:<10}{2:<{0}}{3:>16}{4:>16}{5:>8.2f}{6:>16}{7:>16}\n"), maxPathSize, "Dataset", fmt::format(FMT_COMPILE("{:^{}}{}"), " ", 4, dset.name),
+                            tools::fmtBytes(humanRead, dset.dsetByte, base, decimals), tools::fmtBytes(humanRead, dset.dsetStrg, base, decimals),
+                            dset.dsetRatio, tools::fmtBytes(humanRead, dset.attrByte, base, decimals),
+                            tools::fmtBytes(humanRead, dset.linkByte, base, decimals));
                 if(not printAttr) continue;
                 // Print attributes on this dataset
-                for(auto &attr : dset.attrMetas) {
-                    h5pp::print("{:<10}{:<54}{:>16}{:>16}{:>8}{:>16}\n", "Attribute", h5pp::format("{:^{}}{}", " ", 8, attr.name), " ", " ", " ",
+                for(const auto &attr : dset.attrMetas) {
+                    fmt::print(FMT_COMPILE("{1:<10}{2:<{0}}{3:>16}{4:>16}{5:>8}{6:>16}\n"), maxPathSize, "Attribute", fmt::format(FMT_COMPILE("{:^{}}{}"), " ", 8, attr.name), " ", " ", " ",
                                 tools::fmtBytes(humanRead, attr.attrByte, base, decimals));
                 }
             }
         }
         if(printAttr) {
             // Print attributes on this group
-            for(auto &attr : groupMeta.attrMetas) {
-                h5pp::print("{:<10}{:<54}{:>16}{:>16}{:>8}{:>16}\n", "Attribute", h5pp::format("{:^{}}{}", " ", 4, attr.name), " ", " ", " ",
+            for(const auto &attr : groupMeta.attrMetas) {
+                fmt::print(FMT_COMPILE("{1:<10}{2:<54}{3:>16}{4:>16}{5:>8}{6:>16}\n"), maxPathSize, "Attribute", fmt::format(FMT_COMPILE("{:^{}}{}"), " ", 4, attr.name), " ", " ", " ",
                             tools::fmtBytes(humanRead, attr.attrByte, base, decimals));
             }
         }
