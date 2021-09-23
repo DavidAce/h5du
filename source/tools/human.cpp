@@ -1,8 +1,9 @@
 #include "human.h"
-
 #include <array>
-#include <h5pp/details/h5ppFormat.h>
+#include <fmt/core.h>
+#include <fmt/compile.h>
 #include <string_view>
+
 namespace tools {
     std::string fmtBytes(bool on, size_t bytes, size_t base, size_t decimals) {
         if(on) {
@@ -15,10 +16,10 @@ namespace tools {
 
             uint64_t i;
             for(i = 0; i < orders and dblByte >= dblBase; i++, bytes /= base) dblByte = static_cast<double>(bytes) / dblBase;
-            if(base == 1024) return h5pp::format("{:.{}f} {}", dblByte, decimals, suffixes_1024[i]);
+            if(base == 1024) return fmt::format(FMT_COMPILE("{:.{}f} {}"), dblByte, decimals, suffixes_1024[i]);
             else
-                return h5pp::format("{:.{}f} {}", dblByte, decimals, suffixes_1000[i]);
+                return fmt::format(FMT_COMPILE("{:.{}f} {}"), dblByte, decimals, suffixes_1000[i]);
         } else
-            return h5pp::format("{}", bytes);
+            return fmt::format(FMT_COMPILE("{}"), bytes);
     }
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "attrmeta.h"
+#include "linkmeta.h"
 #include <h5pp/h5pp.h>
 #include <string>
 #include <vector>
@@ -10,9 +11,13 @@ struct DsetMeta {
     std::size_t           dsetStrg  = 0;
     std::size_t           attrByte  = 0;
     std::size_t           attrStrg  = 0;
+    std::size_t           linkByte  = 0;
+    std::size_t           linkStrg  = 0;
     double                dsetRatio = 1.0;
     double                attrRatio = 1.0;
+    double                linkRatio = 1.0;
     std::vector<AttrMeta> attrMetas;
+    std::vector<LinkMeta> linkMetas;
     explicit DsetMeta(const h5pp::DsetInfo &info) {
         info.assertReadReady();
         path = info.dsetPath.value();
