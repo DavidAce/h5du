@@ -201,7 +201,7 @@ def run(cmd,env):
 
 def main():
     project_name = 'h5du'
-    cmake_min_version = version.parse("3.16")
+    cmake_min_version = version.parse("3.15")
 
     assert_cmake_version(cmake_min_version=cmake_min_version)
     args = parse(project_name=project_name)
