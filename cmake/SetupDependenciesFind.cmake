@@ -5,5 +5,4 @@ if(H5DU_PACKAGE_MANAGER MATCHES "find")
     endif()
     # Start finding the dependencies
     find_package(h5pp 1.9.0 ${REQUIRED})
-
 endif()
