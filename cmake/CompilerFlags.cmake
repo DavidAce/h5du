@@ -141,7 +141,7 @@ function(target_link_precompiled_headers tgt)
             endif()
             target_precompile_headers(${tgt} REUSE_FROM pch-obj)
         endif()
-        message(DEBUG "Enabled precompiled headers for target ${tgt}")
+        message(TRACE "Enabled precompiled headers for target ${tgt}")
     endif()
 endfunction()
 
