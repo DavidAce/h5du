@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(h5du
-        VERSION 0.0.1
+        VERSION 1.0.0
         DESCRIPTION "HDF5 Disk Usage"
         HOMEPAGE_URL "")
 
