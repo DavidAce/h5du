@@ -9,8 +9,7 @@
 #include <tools/log.h>
 #include <tools/tree.h>
 void print_usage() {
-    std::cout <<
-        R"(
+    std::string helpstr = R"(
 ==============================================  h5du  ==============================================
 HDF5 Disk Usage Analyzer
 
@@ -46,6 +45,7 @@ Example 3 - Print the size of all groups and datasets recursively in ascending o
     ./h5du -f example.h5 -D -K name -O asc
 
 )";
+    fmt::print("{}\n", helpstr);
 }
 void removeSubstring(std::string &s, std::string_view p) {
     std::string::size_type n = p.length();
