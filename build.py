@@ -20,6 +20,7 @@ def parse(project_name):
     parser.add_argument('--clear-cmake', action='store_true', help='Delete CMake build directory before build')
     parser.add_argument('-c', '--clear-cache', action='store_true', help='Delete CMakeCache.txt before build')
     parser.add_argument('-d', '--dry-run', action='store_true', help='Dry run makes no changes')
+    parser.add_argument('-e', '--examples', action='store_true', help='Build examples')
     parser.add_argument('-i', '--install-prefix', type=str, help='Install Prefix', default='install')
     parser.add_argument('-j', '--make-threads', type=int, help='Make Threads', default=cpu_count())
     parser.add_argument('-G', '--generator', type=str, help='CMake Generator', default=None,
@@ -174,11 +175,18 @@ def generate_cmake_commands(project_name, args):
         cmake_cfg.extend(['-DCMAKE_CXX_FLAGS_INIT:STRING={}'.format(' '.join(cmake_cxx_flags_init))])
 
     if args.test:
-        cmake_tst.extend(['ctest', '--output-on-failure', '--build-config', args.build_type])
+        cmake_cfg.extend(['-D{}_ENABLE_TESTS:BOOL=ON'.format(project_name.upper())])
+        cmake_tst.extend(['ctest', '--output-on-failure', '--build-config', args.build_type,
+                          '--test-dir', '{}/{}'.format(args.build_dir, args.build_type)])
         if args.target and 'test' in args.target:
             cmake_tst.extend(['--build-target', args.target, '-R', args.target])  # Pattern match only the built target
         else:
-            cmake_tst.extend(['-R', project_name])  # Pattern match test targets containing the project name
+            cmake_tst.extend(['-R', project_name.lower()])  # Pattern match test targets containing the project name
+
+    if args.examples:
+        cmake_cfg.extend(['-D{}_BUILD_EXAMPLES:BOOL=ON'.format(project_name.upper())])
+
+
 
     if args.loglevel:
         cmake_cfg.extend(['--loglevel={}'.format(args.loglevel)])
@@ -191,6 +199,8 @@ def generate_cmake_commands(project_name, args):
     return cmake_cfg, cmake_bld, cmake_tst, cmake_env
 
 def run(cmd,env):
+    if len(cmd) == 0:
+        return
     print("Running command: ", ' '.join(cmd))
     with subprocess.Popen(cmd,bufsize=1, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8',env=env) as p:
         for line in p.stdout:
@@ -209,24 +219,5 @@ def main():
                                                                                      args=args)
     run(cmake_cfg_cmd, cmake_env)
     run(cmake_bld_cmd, cmake_env)
-
-    # with subprocess.Popen(cmake_cfg_cmd,bufsize=1, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8',env=cmake_env) as p:
-    #     for out in p.stdout:
-    #         print(out, end='')  # process line here
-    #
-    # if p.returncode != 0:
-    #     raise subprocess.CalledProcessError(p.returncode, ' '.join(p.args))
-
-
-    # cmake_cfg = subprocess.check_output(cmake_cfg_cmd, shell=False, env=cmake_env)
-    # out, err = cmake_cfg.communicate()
-    # print(out)
-    # print(err)
-
-    # cmake_configure(cmd=cmake_cfg_cmd, env=cmake_env)
-    # cmake_build(cmake_bld_cmd)
-    # cmake_test(cmake_tst_cmd)
-
-
 if __name__ == "__main__":
     main()
