@@ -1,3 +1,4 @@
+name: Mirror at KTH-condmat
 on: push
 jobs:
   repo-sync:
