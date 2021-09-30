@@ -1,0 +1,13 @@
+on: push
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    environment: h5du-mirror
+    steps:
+      - name: repo-sync
+        uses: wei/git-sync@v3
+        with:
+          source_repo: "DavidAce/h5pp"
+          source_branch: "master"
+          destination_repo: "https://DavidAce:${{ H5DU_ACCESS_TOKEN }}@github.com/KTH-condmat/h5du.git"
+          destination_branch: "main"
