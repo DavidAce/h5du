@@ -5,8 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: h5du-mirror
     steps:
-      - name: repo-sync
-        uses: wei/git-sync@v3
+      - name: Sync to KTH-condmat/h5du
+        uses: wei/git-sync@v3.0.0
         with:
           source_repo: "DavidAce/h5pp"
           source_branch: "master"
