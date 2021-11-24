@@ -60,6 +60,7 @@ add_executable(h5du
         source/tools/tree.cpp
         source/tools/log.cpp
         source/tools/human.cpp
+        source/tools/text.cpp
         )
 target_include_directories(h5du PRIVATE source)
 set_target_properties(h5du PROPERTIES LINK_WHAT_YOU_USE TRUE)

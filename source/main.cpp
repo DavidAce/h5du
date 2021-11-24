@@ -7,6 +7,7 @@
 #include <meta/groupmeta.h>
 #include <tools/human.h>
 #include <tools/log.h>
+#include <tools/text.h>
 #include <tools/tree.h>
 void print_usage() {
     std::string helpstr = R"(
@@ -47,10 +48,6 @@ Example 3 - Print the size of all groups and datasets recursively in ascending o
 )";
     fmt::print("{}\n", helpstr);
 }
-void removeSubstring(std::string &s, std::string_view p) {
-    std::string::size_type n = p.length();
-    for(std::string::size_type i = s.find(p); i != std::string::npos; i = s.find(p)) s.erase(i, n);
-}
 
 int main(int argc, char *argv[]) {
     // Here we use getopt to parse CLI input
@@ -60,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     std::string filepath;
     std::string filterKey;
-    std::string groupRoot      = ".";
+    std::string groupRoot      = "/";
     int         filterHits     = -1;
     int         filterDepth    = -1;
     size_t      verbosity      = 2;
@@ -137,17 +134,16 @@ int main(int argc, char *argv[]) {
         print_usage();
         throw std::runtime_error(fmt::format(FMT_COMPILE("Invalid path to file: {}\n\tSet argument -f <valid filepath>."), filepath));
     }
-    // Fix for users sometimes starting paths with "./", just remove it
-    removeSubstring(groupRoot, "./");
-
+    // Fix for users sometimes starting paths with "./", just remove the dot
+    text::clipHead(groupRoot, ".");
     auto file = h5pp::File(filepath, h5pp::FilePermission::READONLY, h5pp_verbosity);
 
     // Collect a tree of groups,datasets and attributes
     std::map<std::string, GroupMeta> groupTree;
     for(auto &group : file.findGroups(filterKey, groupRoot, filterHits, -1)) {
         if(group == ".") group = groupRoot;
-        else if(groupRoot != ".")
-            group = fmt::format(FMT_COMPILE("{}/{}"), groupRoot, group);
+        else if (groupRoot != "." and groupRoot != "/")
+            group = fmt::format(FMT_COMPILE("{}/{}"), groupRoot, group); // Cast group to full path
         if(groupTree.find(group) == groupTree.end()) groupTree[group] = GroupMeta(group);
         auto &groupMeta = groupTree[group];
 
@@ -155,8 +151,9 @@ int main(int argc, char *argv[]) {
         // Note that we don't consider filterHits or filterDepth here, but later when printing
 
         // Add datasets inside this group
-        for(auto &dset : file.findDatasets(filterKey, group, filterHits, 0))
+        for(auto &dset : file.findDatasets(filterKey, group, filterHits, 0)) {
             groupMeta.dsetMetas.emplace_back(file.getDatasetInfo(fmt::format(FMT_COMPILE("{}/{}"), group, dset)));
+        }
         // Add attributes attached to this group
         std::vector<std::string> attrsFound;
         if(group.find('/') != std::string::npos) attrsFound = file.getAttributeNames(group);
@@ -173,7 +170,7 @@ int main(int argc, char *argv[]) {
 
         // Add subgroups to this group.
         for(auto &subg : file.findGroups(filterKey, group, -1, 0)) {
-            if(group == ".") groupMeta.subGroups.emplace_back(subg);
+            if(group == "." or group == "/") groupMeta.subGroups.emplace_back(subg);
             else
                 groupMeta.subGroups.emplace_back(fmt::format(FMT_COMPILE("{}/{}"), groupMeta.path, subg));
         }
