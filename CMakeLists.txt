@@ -15,7 +15,6 @@ option(H5DU_INSTALL                     "Enable installation"                   
 option(H5DU_ENABLE_LTO                  "Enable link time optimization"                                OFF)
 option(H5DU_ENABLE_TESTS                "Enable unit testing with ctest"                               OFF)
 option(H5DU_ENABLE_ASAN                 "Enable runtime address sanitizer -fsanitize=address"          OFF)
-option(H5DU_ENABLE_ASAN                 "Enable runtime address sanitizer -fsanitize=address"          OFF)
 option(H5DU_BUILD_EXAMPLES              "Build examples"                                               OFF)
 option(H5DU_PREFIX_ADD_PKGNAME          "Install dependencies into CMAKE_INSTALL_PREFIX/<libname>"     OFF)
 option(CMAKE_POSITION_INDEPENDENT_CODE  "Use -fPIC when compiling shared libraries"                    ON)

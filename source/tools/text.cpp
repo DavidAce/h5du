@@ -27,8 +27,8 @@ void text::removeSubstring(std::string &s, std::string_view p) {
 }
 
 void text::clipHead(std::string &s, std::string_view p) {
-    if(startsWith(s, p)) { s.erase(0, p.length()); }
+    if(s.size() > 1 and startsWith(s, p)) { s.erase(0, p.length()); }
 }
 void text::clipTail(std::string &s, std::string_view p) {
-    if(endsWith(s, p)) { s.erase(s.length() - p.length()); }
+    if(s.size() > 1 and endsWith(s, p)) { s.erase(s.length() - p.length()); }
 }

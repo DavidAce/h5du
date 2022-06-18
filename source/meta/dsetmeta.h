@@ -1,23 +1,23 @@
 #pragma once
 #include "attrmeta.h"
-#include "linkmeta.h"
+#include "headmeta.h"
 #include <h5pp/h5pp.h>
 #include <string>
 #include <vector>
 struct DsetMeta {
     std::string           path;
     std::string           name;
-    std::size_t           dsetByte  = 0;
-    std::size_t           dsetStrg  = 0;
-    std::size_t           attrByte  = 0;
-    std::size_t           attrStrg  = 0;
-    std::size_t           linkByte  = 0;
-    std::size_t           linkStrg  = 0;
-    double                dsetRatio = 1.0;
-    double                attrRatio = 1.0;
-    double                linkRatio = 1.0;
+    mutable std::size_t   dsetByte  = 0;
+    mutable std::size_t   dsetStrg  = 0;
+    mutable std::size_t   attrByte  = 0;
+    mutable std::size_t   attrStrg  = 0;
+    mutable std::size_t   headByte  = 0;
+    mutable std::size_t   headStrg  = 0;
+    mutable double        dsetRatio = 1.0;
+    mutable double        attrRatio = 1.0;
+    mutable double        headRatio = 1.0;
     std::vector<AttrMeta> attrMetas;
-    std::vector<LinkMeta> linkMetas;
+    std::vector<HeadMeta> headMetas;
     explicit DsetMeta(const h5pp::DsetInfo &info) {
         info.assertReadReady();
         path = info.dsetPath.value();

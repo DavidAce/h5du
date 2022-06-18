@@ -51,17 +51,21 @@ if(WIN32)
 endif()
 
 
-# Paths to search for conan installation.
-list(APPEND H5DU_CONAN_CANDIDATE_PATHS
-        ${CONAN_PREFIX}
-        $ENV{CONAN_PREFIX}
-        ${CONDA_PREFIX}
-        $ENV{CONDA_PREFIX}
-        $ENV{HOME}/anaconda3
-        $ENV{HOME}/anaconda
-        $ENV{HOME}/miniconda3
-        $ENV{HOME}/miniconda
-        $ENV{HOME}/.conda
-        )
-
-mark_as_advanced(H5DU_CONAN_CANDIDATE_PATHS)
+if(H5DU_PACKAGE_MANAGER MATCHES "conan")
+    # Paths to search for conan installation.
+    list(APPEND H5DU_CONAN_HINTS
+            ${CONAN_PREFIX}
+            $ENV{CONAN_PREFIX}
+            ${CONDA_PREFIX}
+            $ENV{CONDA_PREFIX}
+            $ENV{HOME}/anaconda3
+            $ENV{HOME}/anaconda
+            $ENV{HOME}/miniconda3
+            $ENV{HOME}/miniconda
+            )
+    list(APPEND H5DU_CONAN_PATH_SUFFIXES
+            bin envs/dmrg/bin
+            )
+    mark_as_advanced(H5DU_CONAN_HINTS)
+    mark_as_advanced(H5DU_CONAN_PATH_SUFFIXES)
+endif()

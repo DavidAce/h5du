@@ -4,7 +4,7 @@
 #include <optional>
 
 namespace tools {
-    inline std::shared_ptr<spdlog::logger> log;
+//    inline std::shared_ptr<spdlog::logger> log;
 
     namespace Logger {
         extern void   enableTimestamp(const std::shared_ptr<spdlog::logger> &log);

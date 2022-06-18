@@ -2,10 +2,8 @@
 # To activate reading this file from CMakeLists.txt, enable the setting -DH5DU_PACKAGE_MANAGER=conan
 
 [requires]
-h5pp/1.9.1@davidace/dev
+h5pp/1.10.0
 
 [generators]
-cmake
+CMakeDeps
 
-[options]
-*:shared=False
